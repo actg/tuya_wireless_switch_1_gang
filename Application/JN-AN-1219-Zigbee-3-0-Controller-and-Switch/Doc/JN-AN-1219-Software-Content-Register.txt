@@ -1,0 +1,33 @@
+Release Name: JN-AN-1219 ZigBee 3.0 Controller and Switch for JN516x/7x
+Release Version: 1007
+
+Locations shown are after application note has been installed into workspace
+
+JN-AN-1219 ZigBee 3.0      Author: NXP
+Controller and Switch      Name: JN-AN-1219 ZigBee 3.0 Controller and Switch 
+for JN516x/7x              for JN516x/7x
+                           Version: 1007
+                           Location: <workspace>/JN-AN-1219-Zigbee-3-0-Controller-and-Switch
+                           Description: Example ZigBee 3.0 template
+                           applications for JN516x/7x
+                           License: Proprietary. See EULA LA_OPT_Base_License
+                           Format: source code, make files, documentation
+                           
+NFC Libraries              Author: NXP
+(ICODE format)             Name: NFC Libraries (ICODE format)
+                           Version: 1000
+                           Location: <workspace>/JN-AN-1219-Zigbee-3-0-Controller-and-Switch/NFC
+                           Description: NFC libraries for NCI and NTAG access
+                           in JN51xx Application Notes
+                           License: Proprietary. See EULA LA_OPT_Base_License
+                           Format: libraries, header files
+                           
+NTAG Library               Author: NXP
+(AES format)               Name: NTAG Library (AES format)
+                           Version: t008
+                           Location: <workspace>/JN-AN-1219-Zigbee-3-0-Controller-and-Switch/NTAG
+                           Description: NTAG library for NTAG access
+                           in JN51xx Application Notes
+                           License: Proprietary. See EULA LA_OPT_Base_License
+                           Format: libraries, header files
+                           
