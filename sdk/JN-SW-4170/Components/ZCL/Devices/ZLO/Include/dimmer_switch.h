@@ -60,7 +60,6 @@ extern "C" {
 #include "Groups.h"
 #include "Scenes.h"
 #include "LevelControl.h"
-#include "privateCluster.h"
 #ifdef CLD_OTA
 #include "OTA.h"
 #endif
@@ -125,10 +124,6 @@ typedef struct
 
 	#if (defined CLD_POWER_CONFIGURATION) && (defined POWER_CONFIGURATION_SERVER)
 		tsZCL_ClusterInstance sPowerConfigurationServer;
-	#endif
-
-	#if (defined CLD_PRIVATE)
-		tsZCL_ClusterInstance sPrivateServer;
 	#endif
 
     #if (defined CLD_OTA) && (defined OTA_CLIENT)
@@ -205,10 +200,6 @@ typedef struct
     	/* Power Configuration Cluster - Server */
 	    tsCLD_PowerConfiguration sPowerConfigServerCluster;
 	#endif    
-
-	#if (defined CLD_PRIVATE)
-    	tsCLD_Private sPrivateServerCluster;
-    #endif
 
     #if (defined CLD_OTA) && (defined OTA_CLIENT)
         tsCLD_AS_Ota sCLD_OTA;

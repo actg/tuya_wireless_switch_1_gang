@@ -130,6 +130,14 @@ typedef enum
     E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME,                               /* Optional */
     /* ZLO extension for OnOff Cluster    */             
     E_CLD_ONOFF_ATTR_ID_STARTUP_ONOFF,                               /* Optional */
+
+	// tuya private
+#ifdef CLD_BAS_ATTR_TUYA_PRIVATE_ID    
+    E_CLD_ONOFF_ATTR_ID_TUYA_SWITCH_BACKLIGHT_STATUS=0x5000,
+    E_CLD_ONOFF_ATTR_ID_TUYA_CHILD_LOCK_STATUS=0x8000,    
+    E_CLD_ONOFF_ATTR_ID_TUYA_INDICATE_LED_STATUS=0x8001,
+    E_CLD_ONOFF_ATTR_ID_TUYA_SWITCH_POWER_ON_STATUS=0x8002,
+#endif    
 } teCLD_OnOff_ClusterID;
 
 /* StartUpOnOff */
@@ -166,6 +174,13 @@ typedef struct
 
 #ifdef CLD_ONOFF_ATTR_ATTRIBUTE_REPORTING_STATUS
     zenum8                  u8AttributeReportingStatus;
+#endif
+
+#ifdef CLD_BAS_ATTR_TUYA_PRIVATE_ID
+	zenum8                  u8TuyaBacklightStatus;
+	zbool                   bChildLock;
+	zenum8                  u8TuyaIndicateLedStatus;
+	zenum8                  u8TuyaPowerOnStatus;
 #endif
 
     zuint16                 u16ClusterRevision;

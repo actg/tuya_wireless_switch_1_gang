@@ -171,7 +171,9 @@ PUBLIC BDB_teStatus BDB_eNsStartNwkSteering(void)
                   with the PermitDuration field set to at least bdbcMinCommissioningTime and
                   the TC_Significance field set to 0x01. */
         /* 8.2-3. NLME-PERMIT-JOINING.request */
-        vNsSendPermitJoin();
+
+        // disable permit join extend
+        //vNsSendPermitJoin();
 
         /* 8.2-4. The node then sets bdbCommissioningStatus to SUCCESS and it SHALL
                   terminate the network steering procedure for a node on a network. */

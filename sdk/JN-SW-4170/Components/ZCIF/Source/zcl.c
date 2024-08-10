@@ -59,8 +59,6 @@
 #include "zps_apl.h"
 #include "zps_apl_af.h"
 
-#include "dbg.h"
-
 #ifndef PC_PLATFORM_BUILD
 #include "version.h"
 #endif
@@ -591,6 +589,8 @@ PRIVATE  teZCL_Status eZCL_CheckClusterStructureIntegrity(tsZCL_EndPointDefiniti
             return(E_ZCL_ERR_SECURITY_RANGE);
         }
 
+#if 0
+		// disable clusterId check,for suitable tuya private cluster
         if(((psEndPointDefinition->bIsManufacturerSpecificProfile == FALSE) &&
             (psEndPointDefinition->psClusterInstance[i].psClusterDefinition->u16ClusterEnum > MAX_STD_CLUSTER_ID) &&
             (psEndPointDefinition->psClusterInstance[i].psClusterDefinition->u16ClusterEnum < MIN_MAN_CLUSTER_ID))
@@ -598,6 +598,7 @@ PRIVATE  teZCL_Status eZCL_CheckClusterStructureIntegrity(tsZCL_EndPointDefiniti
         {
             return(E_ZCL_ERR_CLUSTER_ID_RANGE);
         }
+#endif        
 
         // if cluster in manufacturer specific - Id should be in a certain range
         if(((psEndPointDefinition->psClusterInstance[i].psClusterDefinition->bIsManufacturerSpecificCluster  == TRUE)) &&
@@ -661,6 +662,7 @@ PRIVATE  teZCL_Status eZCL_CheckClusterStructureIntegrity(tsZCL_EndPointDefiniti
                 // spot sequence and replication errors
                 if(u16previousAttributeEnum >= u16AttributeEnum)
                 {
+					// fix bug attribute could not initialize
                 	if((psEndPointDefinition->psClusterInstance[i].psClusterDefinition->psAttributeDefinition[u16Index].u8AttributeFlags & (E_ZCL_AF_MS|E_ZCL_AF_CA)) ||
                 		(psEndPointDefinition->psClusterInstance[i].psClusterDefinition->psAttributeDefinition[u16Index-1].u8AttributeFlags & (E_ZCL_AF_MS|E_ZCL_AF_CA)) )
                 	{
@@ -674,10 +676,6 @@ PRIVATE  teZCL_Status eZCL_CheckClusterStructureIntegrity(tsZCL_EndPointDefiniti
 	                    }
 	                    else
 	                    {
-	                    	DBG_vPrintf(1,"return order:u16Index:%d %x %x\n u16Index-1:%d %x %x\n",u16Index,psEndPointDefinition->psClusterInstance[i].psClusterDefinition->psAttributeDefinition[u16Index].u16AttributeEnum,
-		                    	psEndPointDefinition->psClusterInstance[i].psClusterDefinition->psAttributeDefinition[u16Index].u8AttributeFlags,
-		                    	u16Index-1,psEndPointDefinition->psClusterInstance[i].psClusterDefinition->psAttributeDefinition[u16Index-1].u16AttributeEnum,
-		                    	psEndPointDefinition->psClusterInstance[i].psClusterDefinition->psAttributeDefinition[u16Index-1].u8AttributeFlags);
 	                        return(E_ZCL_ERR_ATTRIBUTE_ID_ORDER);
 	                    }
                     }
@@ -1122,8 +1120,6 @@ PUBLIC  teZCL_Status eZCL_ReportSpecificAttributes(
 					u16AttributeID = psClusterInst->psClusterDefinition->psAttributeDefinition[u16Index].u16AttributeEnum;
 					continue;
 				}
-
-				DBG_vPrintf(1,"actg fill:%x\n", u16AttributeID);
 
 				//Write attribute ID
 				u16Offset += PDUM_u16APduInstanceWriteNBO(hAPduInst,

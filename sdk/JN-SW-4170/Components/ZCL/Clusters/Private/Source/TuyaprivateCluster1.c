@@ -10,7 +10,7 @@
 #include "zcl_customcommand.h"
 #include "zcl_options.h"
 #include "string.h"
-#include "privateCluster.h"
+#include "TuyaPrivateCluster1.h"
 
 #include "dbg.h"
 
@@ -23,21 +23,20 @@
 /****************************************************************************/
 
 #ifdef ZCL_COMMAND_DISCOVERY_SUPPORTED
-const tsZCL_CommandDefinition asCLD_PrivateClusterCommandDefinitions[] =
+PRIVATE const tsZCL_CommandDefinition asCLD_PrivateClusterCommandDefinitions[] =
 {
-    {E_CLD_PRIVATE_CMD_00,              E_ZCL_CF_RX | E_ZCL_CF_TX}
+    {E_CLD_PRIVATE_1_CMD_00,              E_ZCL_CF_RX | E_ZCL_CF_TX}
 };
 #endif
 
-const tsZCL_AttributeDefinition asCLD_PrivateClusterAttributeDefinitions[] =
+PRIVATE const tsZCL_AttributeDefinition asCLD_PrivateClusterAttributeDefinitions[] =
 {
-    {E_CLD_PRIVATE_ATTR_ID_REPORT_KEY, (E_ZCL_AF_RP | E_ZCL_AF_GA),  E_ZCL_UINT8, (uint32)(&((tsCLD_Private*)(0))->u8CustomKeyReport), 0},               /* custom key report */
+    {E_CLD_PRIVATE_ATTR_ID_SWITCH_MODE_TUYA,       (E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP),  E_ZCL_ENUM8, (uint32)(&((tsCLD_PrivateCluster1_t*)(0))->sTuyaSwitchMode), 0},
 };
 
-
-tsZCL_ClusterDefinition sCLD_PrivateCustom =
+tsZCL_ClusterDefinition sCLD_Private1Custom =
 {
-    PRIVATE_CLUSTER_ID_CUSTOM,
+    PRIVATE_CLUSTER_ID_TUYA_PRIVATE_ID1,
     FALSE,
     E_ZCL_SECURITY_NETWORK,
     (sizeof(asCLD_PrivateClusterAttributeDefinitions) / sizeof(tsZCL_AttributeDefinition)),
@@ -50,9 +49,9 @@ tsZCL_ClusterDefinition sCLD_PrivateCustom =
 #endif
 };
 
-uint8 au8PrivateClusterAttributeControlBits[(sizeof(asCLD_PrivateClusterAttributeDefinitions) / sizeof(tsZCL_AttributeDefinition))];
+uint8 au8PrivateCluster1AttributeControlBits[(sizeof(asCLD_PrivateClusterAttributeDefinitions) / sizeof(tsZCL_AttributeDefinition))];
 
-PUBLIC teZCL_Status eCLD_PrivateCommandHandler(
+PRIVATE teZCL_Status eCLD_PrivateCommandHandler(
     ZPS_tsAfEvent               *pZPSevent,
     tsZCL_EndPointDefinition    *psEndPointDefinition,
     tsZCL_ClusterInstance       *psClusterInstance)
@@ -63,14 +62,13 @@ PUBLIC teZCL_Status eCLD_PrivateCommandHandler(
     return(eReturnStatus);
 }
 
-PUBLIC  teZCL_Status eCLD_PrivateCreateCustom(
+PUBLIC  teZCL_Status eCLD_TuyaPrivate1CreateCustom(
     tsZCL_ClusterInstance                   *psClusterInstance,
     bool_t                                  bIsServer,
     tsZCL_ClusterDefinition                 *psClusterDefinition,
     void                                    *pvEndPointSharedStructPtr,
     uint8                                   *pu8AttributeControlBits)
 {
-
 #ifdef STRICT_PARAM_CHECK
     /* Parameter check */
     if((psClusterInstance == NULL) ||
@@ -92,7 +90,10 @@ PUBLIC  teZCL_Status eCLD_PrivateCreateCustom(
 
     if(psClusterInstance->pvEndPointSharedStructPtr != NULL)
     {
-        ((tsCLD_Private*)pvEndPointSharedStructPtr)->u8CustomKeyReport = 0;
+    	if(bIsServer)
+    	{
+        	((tsCLD_PrivateCluster1_t*)pvEndPointSharedStructPtr)->sTuyaSwitchMode=0;	
+        }
     }
 
     /* As this cluster has reportable attributes enable default reporting */

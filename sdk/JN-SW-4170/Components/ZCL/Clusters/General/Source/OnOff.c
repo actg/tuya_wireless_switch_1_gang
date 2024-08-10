@@ -109,15 +109,23 @@ const tsZCL_AttributeDefinition asCLD_OnOffClusterAttributeDefinitions[] = {
     {E_CLD_ONOFF_ATTR_ID_GLOBAL_SCENE_CONTROL,  (E_ZCL_AF_RD),                          E_ZCL_BOOL,     (uint32)(&((tsCLD_OnOff*)(0))->bGlobalSceneControl),0},     /* Optional */
 #endif
 #ifdef CLD_ONOFF_ATTR_ON_TIME
-    {E_CLD_ONOFF_ATTR_ID_ON_TIME,               (E_ZCL_AF_RD|E_ZCL_AF_WR),              E_ZCL_UINT16,   (uint32)(&((tsCLD_OnOff*)(0))->u16OnTime),0},     /* Optinal */
+    {E_CLD_ONOFF_ATTR_ID_ON_TIME,               (E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP),  E_ZCL_UINT16,   (uint32)(&((tsCLD_OnOff*)(0))->u16OnTime),0},     /* Optinal */
 #endif
 #ifdef CLD_ONOFF_ATTR_OFF_WAIT_TIME
-    {E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME,         (E_ZCL_AF_RD|E_ZCL_AF_WR),              E_ZCL_UINT16,   (uint32)(&((tsCLD_OnOff*)(0))->u16OffWaitTime),0},     /* Optinal */
+    {E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME,         (E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP),  E_ZCL_UINT16,   (uint32)(&((tsCLD_OnOff*)(0))->u16OffWaitTime),0},     /* Optinal */
 #endif
 
 #ifdef CLD_ONOFF_ATTR_STARTUP_ONOFF
     /* ZLO extension for OnOff Cluster    */             
     {E_CLD_ONOFF_ATTR_ID_STARTUP_ONOFF,         (E_ZCL_AF_RD|E_ZCL_AF_WR),              E_ZCL_ENUM8,     (uint32)(&((tsCLD_OnOff*)(0))->eStartUpOnOff),0},     /* Optinal */
+#endif
+
+	// tuya private
+#ifdef CLD_BAS_ATTR_TUYA_PRIVATE_ID
+	{E_CLD_ONOFF_ATTR_ID_TUYA_SWITCH_BACKLIGHT_STATUS,(E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP), E_ZCL_ENUM8,   (uint32)(&((tsCLD_OnOff*)(0))->u8TuyaBacklightStatus),0},
+	{E_CLD_ONOFF_ATTR_ID_TUYA_CHILD_LOCK_STATUS,      (E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP), E_ZCL_BOOL,    (uint32)(&((tsCLD_OnOff*)(0))->bChildLock),0},
+	{E_CLD_ONOFF_ATTR_ID_TUYA_INDICATE_LED_STATUS,    (E_ZCL_AF_RD|E_ZCL_AF_WR),             E_ZCL_ENUM8,   (uint32)(&((tsCLD_OnOff*)(0))->u8TuyaIndicateLedStatus),0},
+	{E_CLD_ONOFF_ATTR_ID_TUYA_SWITCH_POWER_ON_STATUS,(E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP),  E_ZCL_ENUM8,   (uint32)(&((tsCLD_OnOff*)(0))->u8TuyaPowerOnStatus),0},
 #endif
 
     {E_CLD_GLOBAL_ATTR_ID_CLUSTER_REVISION,     (E_ZCL_AF_RD|E_ZCL_AF_GA),               E_ZCL_UINT16,   (uint32)(&((tsCLD_OnOff*)(0))->u16ClusterRevision),0},   /* Mandatory  */
@@ -263,6 +271,14 @@ PUBLIC  teZCL_Status eCLD_OnOffCreateOnOff(
             #ifdef CLD_ONOFF_ATTR_OFF_WAIT_TIME
                 ((tsCLD_OnOff *)(psClusterInstance->pvEndPointSharedStructPtr))->u16OffWaitTime = 0;
             #endif
+
+		// tuya private
+#ifdef CLD_BAS_ATTR_TUYA_PRIVATE_ID
+			((tsCLD_OnOff *)(psClusterInstance->pvEndPointSharedStructPtr))->u8TuyaBacklightStatus = 1;
+			((tsCLD_OnOff *)(psClusterInstance->pvEndPointSharedStructPtr))->bChildLock=0;             // child lock,default off
+			((tsCLD_OnOff *)(psClusterInstance->pvEndPointSharedStructPtr))->u8TuyaIndicateLedStatus = 0;
+			((tsCLD_OnOff *)(psClusterInstance->pvEndPointSharedStructPtr))->u8TuyaPowerOnStatus = 0;  // default switch status whenever power on (0x00: off,0x01:on, 0x02: record previous status)
+#endif	
             
             ((tsCLD_OnOff *)(psClusterInstance->pvEndPointSharedStructPtr))->u16ClusterRevision =  CLD_ONOFF_CLUSTER_REVISION;
         #endif
@@ -277,7 +293,7 @@ PUBLIC  teZCL_Status eCLD_OnOffCreateOnOff(
 
     #ifdef ONOFF_SERVER
         if(bIsServer)
-        {    
+        { 
             /* As this cluster has reportable attributes enable default reporting */
             vZCL_SetDefaultReporting(psClusterInstance);
         }
@@ -478,27 +494,62 @@ PUBLIC  teZCL_Status eCLD_OnOffUpdate(uint8 u8SourceEndPointId)
      * attribute. If the value of the OffWaitTime attribute reaches 0x0000, the device shall terminate
      * the update.
      */
-    if((psSharedStruct->u16OnTime < 0xffff) && (psSharedStruct->u16OffWaitTime < 0xffff) &&
+    if((psSharedStruct->u16OffWaitTime < 0xffff) &&
        ((psSharedStruct->u16OnTime != 0) || (psSharedStruct->u16OffWaitTime != 0)))
     {
 
         DBG_vPrintf(TRACE_ONOFF, "\neCLD_OnOffUpdate: ");
 
-        if((psSharedStruct->bOnOff == 0x01) && (psSharedStruct->u16OnTime > 0))
+        if(psSharedStruct->u16OnTime > 0)
         {
-            psSharedStruct->u16OnTime--;
-            if(psSharedStruct->u16OnTime == 0)
-            {
-                psSharedStruct->u16OffWaitTime = 0x0000;
-                psSharedStruct->bOnOff = 0x00;
-            }
-        }
-        else if((psSharedStruct->bOnOff == 0x00) && (psSharedStruct->u16OffWaitTime > 0))
-        {
-            psSharedStruct->u16OffWaitTime--;
+        	psSharedStruct->u16OnTime--;
+        	// do nothing
         }
 
-        DBG_vPrintf(TRACE_ONOFF, "OnTime=%d OffWaitTime=%d On=%d", psSharedStruct->u16OnTime, psSharedStruct->u16OffWaitTime, psSharedStruct->bOnOff);
+        if(psSharedStruct->u16OffWaitTime > 0)
+        {
+            psSharedStruct->u16OffWaitTime--;
+            if(psSharedStruct->u16OffWaitTime == 0)
+            {
+            	// toggle onOff
+				tsZCL_CallBackEvent sOnOffCustomCallBackEvent;
+				tsCLD_OnOffCallBackMessage sOnOffCallBackMessage;
+				
+				psSharedStruct->bOnOff ^= 0x01;
+				
+				/* Generate a custom command event */
+				uint8 u8TransactionSequenceNumber=u8GetTransactionSequenceNumber();
+				eZCL_SetCustomCallBackEvent(&sOnOffCustomCallBackEvent, NULL, u8TransactionSequenceNumber, psEndPointDefinition->u8EndPointNumber);
+				sOnOffCustomCallBackEvent.eEventType = E_ZCL_CBET_CLUSTER_CUSTOM;
+				sOnOffCustomCallBackEvent.uMessage.sClusterCustomMessage.u16ClusterId = psClusterInstance->psClusterDefinition->u16ClusterEnum;
+				sOnOffCustomCallBackEvent.uMessage.sClusterCustomMessage.pvCustomData = (void *)&sOnOffCallBackMessage;
+				sOnOffCustomCallBackEvent.psClusterInstance = psClusterInstance;
+				
+				/* Fill in message */
+				sOnOffCallBackMessage.u8CommandId = psSharedStruct->bOnOff;
+				
+				// call callback
+				psEndPointDefinition->pCallBackFunctions(&sOnOffCustomCallBackEvent);
+
+			    // report attribute
+			    PDUM_thAPduInstance hAPduInst = hZCL_AllocateAPduInstance();
+			    tsZCL_Address         sAddress;
+			    sAddress.eAddressMode=E_ZCL_AM_SHORT;
+			    sAddress.uAddress.u16DestinationAddress=0x0000;
+
+			    // report tuya private attribute
+			    eStatus=eZCL_ReportAttribute(&sAddress,
+			    	GENERAL_CLUSTER_ID_ONOFF,
+			    	E_CLD_ONOFF_ATTR_ID_ONOFF,
+			    	1,
+					1,
+			    	hAPduInst);
+
+				PDUM_eAPduFreeAPduInstance(hAPduInst);				
+            }
+        }
+
+        DBG_vPrintf(TRACE_ONOFF, "OnTime=%d OffWaitTime=%d On=%d\n", psSharedStruct->u16OnTime, psSharedStruct->u16OffWaitTime, psSharedStruct->bOnOff);
 
         /* Generate a callback to let the user know that an update event occurred */
         sZCL_CallBackEvent.u8EndPoint           = psEndPointDefinition->u8EndPointNumber;

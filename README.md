@@ -8,7 +8,7 @@ based JN5169 model JN5169模块
 
 #### JN5169 NXP开发环境搭建
 - 参考其他说明
-
+- 为了减小仓库体积，sdk/Tools没有添加跟踪
 
 
 ![img](tuya_wireless_1_gang.png)

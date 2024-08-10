@@ -115,7 +115,7 @@
 
 const tsZCL_AttributeDefinition asCLD_IdentifyClusterAttributeDefinitions[] = {
 #ifdef IDENTIFY_SERVER
-        {E_CLD_IDENTIFY_ATTR_ID_IDENTIFY_TIME,      (E_ZCL_AF_RD|E_ZCL_AF_WR),  E_ZCL_UINT16,   (uint32)(&((tsCLD_Identify*)(0))->u16IdentifyTime),0},     /* Mandatory */
+        {E_CLD_IDENTIFY_ATTR_ID_IDENTIFY_TIME,      (E_ZCL_AF_RD|E_ZCL_AF_WR|E_ZCL_AF_RP),  E_ZCL_UINT16,   (uint32)(&((tsCLD_Identify*)(0))->u16IdentifyTime),0},     /* Mandatory */
 
     #ifdef CLD_IDENTIFY_ATTR_COMMISSION_STATE
         {E_CLD_IDENTIFY_ATTR_ID_COMMISSION_STATE,    (E_ZCL_AF_RD),              E_ZCL_BMAP8,    (uint32)(&((tsCLD_Identify*)(0))->u8CommissionState),0},      /* Optional */

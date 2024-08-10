@@ -43,7 +43,7 @@
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
-#define BUTTON_DELAY_TIME_IN_MS 250
+#define BUTTON_DELAY_TIME_IN_MS 10
 
 #define ON   (1 << APP_BUTTONS_BUTTON_SW1)
 #define COMM (1 << APP_BUTTONS_BUTTON_1)

@@ -229,7 +229,6 @@ PUBLIC void APP_vInitialiseNode(void)
 
     PDM_eSaveRecordData(PDM_ID_APP_CONVERT, &sConvertR21toR22, sizeof(tsConvertR21toR22));
 
-
     /* Initialise ZBPro stack */
     ZPS_eAplAfInit();
 
@@ -1140,7 +1139,7 @@ PRIVATE void vDeletePDMOnButtonPress(uint8 u8ButtonDIO)
  ****************************************************************************/
 PUBLIC void vAppOnOff(teCLD_OnOff_Command eCmd)
 {
-
+#ifdef ONOFF_CLIENT
     uint8 u8Seq;
     tsZCL_Address sAddress;
 
@@ -1154,11 +1153,13 @@ PUBLIC void vAppOnOff(teCLD_OnOff_Command eCmd)
             sDeviceInfo.sLightInfo[sDeviceInfo.u8Index].u8Ep,
             &sAddress, &u8Seq, eCmd);
     }
+#endif    
 }
 
 // tirgger tuya scene
 PUBLIC void vAppTuyaSceneTrigger(teCLD_OnOff_Command eCmd)
 {
+#ifdef ONOFF_CLIENT
     uint8 u8Seq;
     tsZCL_Address sAddress;
 
@@ -1172,6 +1173,7 @@ PUBLIC void vAppTuyaSceneTrigger(teCLD_OnOff_Command eCmd)
             1,
             &sAddress, &u8Seq, eCmd);
     }
+#endif    
 }
 
 /****************************************************************************

@@ -103,7 +103,6 @@ const tsZCL_AttributeDefinition asCLD_TimeClusterAttributeDefinitions[] = {
     #ifdef CLD_TIME_ATTR_LOCAL_TIME
         {E_CLD_TIME_ATTR_ID_LOCAL_TIME,     (E_ZCL_AF_RD),  E_ZCL_UINT32,   (uint32)(&((tsCLD_Time*)(0))->u32LocalTime),0},
     #endif
-
     #ifdef CLD_TIME_ATTR_LAST_SET_TIME
         {E_CLD_TIME_ATTR_ID_LAST_SET_TIME,     (E_ZCL_AF_RD),  E_ZCL_UTCT,   (uint32)(&((tsCLD_Time*)(0))->u32LastSetTime),0},
     #endif
@@ -111,7 +110,9 @@ const tsZCL_AttributeDefinition asCLD_TimeClusterAttributeDefinitions[] = {
     #ifdef CLD_TIME_ATTR_VALID_UNTIL_TIME
         {E_CLD_TIME_ATTR_ID_VALID_UNTIL_TIME,     (E_ZCL_AF_RD|E_ZCL_AF_WR),  E_ZCL_UTCT,   (uint32)(&((tsCLD_Time*)(0))->u32ValidUntilTime),0},
     #endif
-#endif    
+#endif
+
+
         {E_CLD_GLOBAL_ATTR_ID_CLUSTER_REVISION,   (E_ZCL_AF_RD|E_ZCL_AF_GA),  E_ZCL_UINT16,     (uint32)(&((tsCLD_Time*)(0))->u16ClusterRevision),0},   /* Mandatory  */
 
     };

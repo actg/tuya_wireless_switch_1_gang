@@ -222,13 +222,45 @@ PUBLIC teZCL_Status eZCL_Update100mS(void)
                 #if (defined COLOUR_CONTROL_SERVER)
                     eCLD_ColourControlUpdate(i);
                 #endif
- 
-                #if (defined ONOFF_SERVER) && (defined CLD_ONOFF_CMD_ON_WITH_TIMED_OFF)
-                    eCLD_OnOffUpdate(i);
-                #endif
 
                 #if (defined IDENTIFY_SERVER) && (defined CLD_IDENTIFY_10HZ_TICK)
                     vIdEffectTick(i);
+                #endif
+            }
+        }
+    #endif
+    return E_ZCL_SUCCESS;
+}
+
+/****************************************************************************
+ *
+ * NAME: eZCL_Update1Second
+ *
+ * DESCRIPTION:
+ * Should be called by an application timer 1 times per second
+ *
+ * PARAMETERS:  Name                            Usage
+ *
+ * RETURNS:
+ * teZCL_Status
+ *
+ ****************************************************************************/
+PUBLIC teZCL_Status eZCL_Update1Second(void)
+{
+
+    /* Update clusters on each end point if any */
+    #if ((defined LEVEL_CONTROL_SERVER) || (defined SCENES_SERVER) || \
+         (defined COLOUR_CONTROL_SERVER)|| (defined ONOFF_SERVER) || \
+         (defined IDENTIFY_SERVER) )
+        {
+            uint8 u8NumEndpoints;
+            u8NumEndpoints = u8ZCL_GetNumberOfEndpointsRegistered();
+
+            int i;
+            for (i = 1; i < (u8NumEndpoints + 1); i++)
+            {
+                #if (defined ONOFF_SERVER) && (defined CLD_ONOFF_CMD_ON_WITH_TIMED_OFF)
+                    eCLD_OnOffUpdate(i);
                 #endif
             }
         }

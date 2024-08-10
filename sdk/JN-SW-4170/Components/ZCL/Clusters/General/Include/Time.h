@@ -213,7 +213,6 @@ typedef struct
 #ifdef CLD_TIME_ATTR_LOCAL_TIME
     zuint32                u32LocalTime;
 #endif
-
 #ifdef CLD_TIME_ATTR_LAST_SET_TIME
     zutctime                u32LastSetTime;
 #endif
@@ -222,6 +221,8 @@ typedef struct
     zutctime                u32ValidUntilTime;
 #endif
 #endif
+
+
     zuint16                 u16ClusterRevision;
 } tsCLD_Time;
 

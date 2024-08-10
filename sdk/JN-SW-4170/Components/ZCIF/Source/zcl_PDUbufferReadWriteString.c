@@ -276,6 +276,7 @@ PUBLIC uint16 u16ZCL_WriteStringTypeNBO(
     {
         case(E_ZCL_OSTRING):
         case(E_ZCL_CSTRING):
+        case(E_ZCL_ARRAY):
         {
             *pu8Data++ = (uint8)u16stringLengthField;
             break;
@@ -426,6 +427,16 @@ PUBLIC uint16 u16ZCL_GetStringSizeAndBufferFromStructure(
             u16ActualLength = 1;
             u16IllegalStringLength = STRING_LENGTH_ILLEGAL_8;
             break;
+        }
+        case(E_ZCL_ARRAY):
+        {
+            // unpack structure
+            *pu16stringDataLength = ((tsZCL_Array *)pvStringStruct)->u16Length;
+            u16MaxLength = ((tsZCL_Array *)pvStringStruct)->u16MaxLength;
+            *ppu8stringData = ((tsZCL_Array *)pvStringStruct)->pu8Data;
+            u16ActualLength = 2;
+            u16IllegalStringLength = STRING_LENGTH_ILLEGAL_16;
+        	break;
         }
         case(E_ZCL_CSTRING):
         {

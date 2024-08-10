@@ -59,6 +59,25 @@
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
+#define	BEGYEAR  2000     //  UTC started at 00:00:00 January 1, 2000
+
+#define	DAY      86400UL  // 24 hours * 60 minutes * 60 seconds
+
+#define TM_SUNDAY	0
+#define TM_MONDAY	1
+#define TM_TUESDAY	2
+#define TM_WEDNESDAY	3
+#define TM_THURSDAY	4
+#define TM_FRIDAY	5
+#define TM_SATURDAY	6
+
+#define EPOCH_WDAY	TM_SATURDAY
+
+#define DAYSPERWEEK	7
+
+#define	IsLeapYear(yr)	(!((yr) % 400) || (((yr) % 100) && !((yr) % 4)))
+#define	YearLength(yr)	((uint16)(IsLeapYear(yr) ? 366 : 365))
+
 
 /****************************************************************************/
 /***        Type Definitions                                              ***/
@@ -441,6 +460,83 @@ PRIVATE bool boExpiredCheck(
     // no deletion required
     return FALSE;
 
+}
+
+/*********************************************************************
+ * @fn      monthLength
+ *
+ * @param   lpyr - 1 for leap year, 0 if not
+ *
+ * @param   mon - 0 - 11 (jan - dec)
+ *
+ * @return  number of days in specified month
+ */
+PRIVATE uint8 monthLength( uint8 lpyr, uint8 mon )
+{
+  uint8 days = 31;
+
+	if ( mon == 1 ) // feb
+  {
+		days = ( 28 + lpyr );
+  }
+  else
+  {
+    if ( mon > 6 ) // aug-dec
+    {
+      mon--;
+    }
+
+    if ( mon & 1 )
+    {
+      days = 30;
+    }
+  }
+
+	return ( days );
+}
+
+/*********************************************************************
+ * @fn      vZCL_ConvertUTCTime
+ *
+ * @brief   Converts UTCTime to UTCTimeStruct
+ *
+ * @param   tm - pointer to breakdown struct
+ *
+ * @param   secTime - number of seconds since 0 hrs, 0 minutes,
+ *          0 seconds, on the 1st of January 2000 UTC
+ *
+ * @return  none
+ */
+void vZCL_ConvertUTCTime(UTCTimeStruct* tm, uint32 secTime)
+{
+    // calculate the time less than a day - hours, minutes, seconds
+    {
+        uint32 day = secTime % DAY;
+        tm->seconds = day % 60UL;
+        tm->minutes = (uint8)((day % 3600UL) / 60UL);
+        tm->hour = (uint8)(day / 3600UL);
+    }
+
+    // Fill in the calendar - day, month, year
+    {
+        uint16 numDays = secTime / DAY;
+        tm->wday = (uint8)((EPOCH_WDAY + numDays) % DAYSPERWEEK);
+        tm->year = BEGYEAR;
+        while (numDays >= YearLength(tm->year))
+        {
+            numDays -= YearLength(tm->year);
+            tm->year++;
+        }
+
+        tm->month = 0;
+        while (numDays >= monthLength(IsLeapYear(tm->year), tm->month))
+        {
+            numDays -= monthLength(IsLeapYear(tm->year), tm->month);
+            tm->month++;
+        }
+
+        tm->day = (uint8)numDays;
+    }
 }
 
 /****************************************************************************/

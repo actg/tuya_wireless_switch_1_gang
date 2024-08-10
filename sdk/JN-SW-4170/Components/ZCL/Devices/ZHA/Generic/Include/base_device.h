@@ -58,6 +58,16 @@ extern "C" {
 #include "Identify.h"
 #include "Groups.h"
 #include "OnOff.h"
+
+#ifdef CLD_TIME
+#include "Time.h"
+#endif
+
+#if (defined CLD_PRIVATE) && (defined PRIVATE_SERVER)
+#include "TuyaPrivateCluster0.h"
+#include "TuyaPrivateCluster1.h"
+#endif
+
 #ifdef CLD_OTA
 #include "OTA.h"
 #endif
@@ -105,6 +115,20 @@ typedef struct
 
 #if (defined CLD_ONOFF) && (defined ONOFF_CLIENT)
     tsZCL_ClusterInstance sOnOffClient;
+#endif
+
+#if (defined CLD_PRIVATE) && (defined PRIVATE_SERVER)
+	tsZCL_ClusterInstance sPrivate0Server;
+	tsZCL_ClusterInstance sPrivate1Server;	
+#endif
+
+#ifdef CLD_TIME
+    #ifdef TIME_SERVER
+	tsZCL_ClusterInstance sTimeServer;
+    #endif
+    #ifdef TIME_CLIENT
+	tsZCL_ClusterInstance sTimeClient;
+    #endif
 #endif
 
 /* OTA Cluster Instance */
@@ -165,6 +189,20 @@ typedef struct
 
 #if (defined CLD_ONOFF) && (defined ONOFF_CLIENT)
     tsCLD_OnOffClient sOnOffClientCluster;
+#endif
+
+#if (defined CLD_PRIVATE) && (defined PRIVATE_SERVER)
+	tsCLD_PrivateCluster0_t sPrivate0ServerCluster;
+	tsCLD_PrivateCluster1_t sPrivate1ServerCluster;	
+#endif
+
+#ifdef CLD_TIME
+    #ifdef TIME_SERVER
+		
+    #endif
+    #ifdef TIME_CLIENT
+		tsCLD_Time sTimeClientCluster;
+    #endif
 #endif
 
 #if (defined CLD_OTA) && (defined OTA_CLIENT)

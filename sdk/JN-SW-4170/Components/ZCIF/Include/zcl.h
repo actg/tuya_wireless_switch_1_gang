@@ -466,6 +466,17 @@ typedef enum
     E_ZCL_ATTR_REPORT_ERR
 } teZCL_ReportAttributeStatus;
 
+typedef struct
+{
+  uint8 seconds;  // 0-59
+  uint8 minutes;  // 0-59
+  uint8 hour;     // 0-23
+  uint8 wday;     // 0-6
+  uint8 day;      // 0-30
+  uint8 month;    // 0-11
+  uint16 year;    // 2000+
+} UTCTimeStruct;
+
 /* Bit wise processing Macros */
 #define ZCL_OFFSET(strct, member)           (uint32)&(((strct *)0)->member)
 #define ZCL_BIT(type, n)                    ( (type)1 << n )
@@ -1002,6 +1013,8 @@ PUBLIC void vZCL_SetUTCTime(
                     uint32                      u32UTCTime);
 
 PUBLIC uint32 u32ZCL_GetUTCTime(void);
+PUBLIC void vZCL_ConvertUTCTime(UTCTimeStruct* tm, uint32 secTime);
+
 PUBLIC teZCL_Status eZCL_UpdateMsTimer(
                     tsZCL_EndPointDefinition   *psEndPointDefinition,
                     bool_t                      bEnable,
@@ -1204,6 +1217,7 @@ PUBLIC teZCL_Status eZCL_Initialise(tfpZCL_ZCLCallBackFunction cbCallBack,
                                    PDUM_thAPdu hAPdu);
 
 PUBLIC teZCL_Status eZCL_Update100mS(void);   
+PUBLIC teZCL_Status eZCL_Update1Second(void);
 
 PUBLIC void vZCL_DisableAPSACK(
                                 bool_t       bDisableAPSACK);

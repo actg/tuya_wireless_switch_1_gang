@@ -224,6 +224,38 @@ PUBLIC teZCL_Status eZHA_RegisterBaseDeviceEndPoint(uint8 u8EndPointIdentifier,
     } 
 #endif
 
+#if (defined CLD_PRIVATE) && (defined PRIVATE_SERVER)
+	if(eCLD_TuyaPrivate0CreateCustom(&psDeviceInfo->sClusterInstance.sPrivate0Server,
+						TRUE,
+						&sCLD_Private0Custom,
+						&psDeviceInfo->sPrivate0ServerCluster,
+						&au8PrivateCluster0AttributeControlBits[0]) != E_ZCL_SUCCESS)
+	{
+		return E_ZCL_FAIL;
+	}
+
+	if(eCLD_TuyaPrivate1CreateCustom(&psDeviceInfo->sClusterInstance.sPrivate1Server,
+						TRUE,
+						&sCLD_Private1Custom,
+						&psDeviceInfo->sPrivate1ServerCluster,
+						&au8PrivateCluster1AttributeControlBits[0]) != E_ZCL_SUCCESS)
+	{
+		return E_ZCL_FAIL;
+	}	
+#endif
+
+#if (defined CLD_TIME && defined TIME_CLIENT)
+		if (eCLD_TimeCreateTime(
+						&psDeviceInfo->sClusterInstance.sTimeClient,
+						FALSE,
+						&sCLD_Time,
+						&psDeviceInfo->sTimeClientCluster,
+						&au8TimeClusterAttributeControlBits[0]) != E_ZCL_SUCCESS)
+		{
+			return E_ZCL_FAIL;
+		}
+#endif
+
 #if (defined CLD_OTA) && (defined OTA_CLIENT)
     /* Create an instance of an OTA cluster as a client */
     if(eOTA_Create(&psDeviceInfo->sClusterInstance.sOTAClient,

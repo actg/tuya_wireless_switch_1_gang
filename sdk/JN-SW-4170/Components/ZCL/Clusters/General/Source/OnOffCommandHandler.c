@@ -344,12 +344,6 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOnCommand(
     psSharedStruct->bGlobalSceneControl = 0x01;
 #endif
 
-    /* If OnOff is already on, exit */
-    if(psSharedStruct->bOnOff == 0x01)
-    {
-        return eStatus;
-    }
-
 #if (defined CLD_LEVEL_CONTROL) && (defined LEVEL_CONTROL_SERVER)
     if(eCLD_LevelControlClusterIsPresent(psEndPointDefinition->u8EndPointNumber) == E_ZCL_SUCCESS)
     {
@@ -368,6 +362,32 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOnCommand(
     }
 #else
     psSharedStruct->bOnOff = 0x01;
+
+#if defined (CLD_ONOFF_ATTR_ON_TIME) && defined (CLD_ONOFF_ATTR_OFF_WAIT_TIME)
+	if((psSharedStruct->u16OffWaitTime > 0) || (psSharedStruct->u16OnTime > 0))
+	{
+		psSharedStruct->u16OnTime=0;
+		psSharedStruct->u16OffWaitTime=0;
+	 	// disable the offWaitTime,and report attribute
+	    tsZCL_Address         sAddress;
+	    uint16                u16AttributeIDList[]={E_CLD_ONOFF_ATTR_ID_ON_TIME,E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME};
+	    uint8                 u8NumberOfAttributesInReport=(sizeof(u16AttributeIDList)/sizeof(u16AttributeIDList[0]));
+
+	    // build address structure
+	    eZCL_BuildTransmitAddressStructure(pZPSevent, &sAddress);
+	    PDUM_thAPduInstance hAPduInst = hZCL_AllocateAPduInstance();    
+	    eZCL_ReportSpecificAttributes(&sAddress,
+	    	GENERAL_CLUSTER_ID_ONOFF,
+	    	pZPSevent->uEvent.sApsDataIndEvent.u8SrcEndpoint,
+			pZPSevent->uEvent.sApsDataIndEvent.u8DstEndpoint,
+			u8NumberOfAttributesInReport,
+			u16AttributeIDList,
+	    	hAPduInst);
+
+		PDUM_eAPduFreeAPduInstance(hAPduInst);
+	}
+#endif
+
 #endif
 
     return eStatus;
@@ -418,12 +438,6 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOffCommand(
     psSharedStruct->u16OnTime = 0x0000;
 #endif
 
-    /* If already off, exit */
-    if(psSharedStruct->bOnOff == 0)
-    {
-        return eStatus;
-    }
-
 #if (defined CLD_LEVEL_CONTROL) && (defined LEVEL_CONTROL_SERVER)
     if(eCLD_LevelControlClusterIsPresent(psEndPointDefinition->u8EndPointNumber) == E_ZCL_SUCCESS)
     {
@@ -442,6 +456,32 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOffCommand(
     }
 #else
     psSharedStruct->bOnOff = 0x00;
+
+#if defined (CLD_ONOFF_ATTR_ON_TIME) && defined (CLD_ONOFF_ATTR_OFF_WAIT_TIME)
+	if((psSharedStruct->u16OffWaitTime > 0) || (psSharedStruct->u16OnTime > 0))
+	{
+		psSharedStruct->u16OnTime=0;
+		psSharedStruct->u16OffWaitTime=0;
+		// disable the offWaitTime,and report attribute
+		tsZCL_Address		  sAddress;
+		uint16				  u16AttributeIDList[]={E_CLD_ONOFF_ATTR_ID_ON_TIME,E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME};
+		uint8				  u8NumberOfAttributesInReport=(sizeof(u16AttributeIDList)/sizeof(u16AttributeIDList[0]));
+
+		// build address structure
+		eZCL_BuildTransmitAddressStructure(pZPSevent, &sAddress);
+		PDUM_thAPduInstance hAPduInst = hZCL_AllocateAPduInstance();	
+		eZCL_ReportSpecificAttributes(&sAddress,
+			GENERAL_CLUSTER_ID_ONOFF,
+			pZPSevent->uEvent.sApsDataIndEvent.u8SrcEndpoint,
+			pZPSevent->uEvent.sApsDataIndEvent.u8DstEndpoint,
+			u8NumberOfAttributesInReport,
+			u16AttributeIDList,
+			hAPduInst);
+
+		PDUM_eAPduFreeAPduInstance(hAPduInst);
+	}
+#endif
+	
 #endif
 
     return eStatus;
@@ -525,6 +565,31 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleToggleCommand(
 #else
     psSharedStruct->bOnOff ^= 0x01;
 #endif
+
+#if defined (CLD_ONOFF_ATTR_ON_TIME) && defined (CLD_ONOFF_ATTR_OFF_WAIT_TIME)
+	if((psSharedStruct->u16OffWaitTime > 0) || (psSharedStruct->u16OnTime > 0))
+	{
+		psSharedStruct->u16OnTime=0;
+		psSharedStruct->u16OffWaitTime=0;
+	 	// disable the offWaitTime,and report attribute
+	    tsZCL_Address         sAddress;
+	    uint16                u16AttributeIDList[]={E_CLD_ONOFF_ATTR_ID_ON_TIME,E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME};
+	    uint8                 u8NumberOfAttributesInReport=(sizeof(u16AttributeIDList)/sizeof(u16AttributeIDList[0]));
+
+	    // build address structure
+	    eZCL_BuildTransmitAddressStructure(pZPSevent, &sAddress);
+	    PDUM_thAPduInstance hAPduInst = hZCL_AllocateAPduInstance();    
+	    eZCL_ReportSpecificAttributes(&sAddress,
+	    	GENERAL_CLUSTER_ID_ONOFF,
+	    	pZPSevent->uEvent.sApsDataIndEvent.u8SrcEndpoint,
+			pZPSevent->uEvent.sApsDataIndEvent.u8DstEndpoint,
+			u8NumberOfAttributesInReport,
+			u16AttributeIDList,
+	    	hAPduInst);
+
+		PDUM_eAPduFreeAPduInstance(hAPduInst);
+	}
+#endif	
 
 #ifdef CLD_ONOFF_ATTR_GLOBAL_SCENE_CONTROL
     if(psSharedStruct->bOnOff == TRUE)
@@ -775,10 +840,10 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOnWithTimedOffCommand(
     {
         DBG_vPrintf(TRACE_ONOFF, "Error: %d", eStatus);
         return(E_ZCL_FAIL);
-    }
+    }   
 
     DBG_vPrintf(TRACE_ONOFF, "OnOff=%d OnTime=%d OffTime=%d", sPayload.u8OnOff, sPayload.u16OnTime, sPayload.u16OffTime);
-    
+
     /* Valid range of OnTime and OffWaitTime fields is 0x0000-0xFFFE*/
     if((sPayload.u16OffTime > 0xFFFE) ||
        (sPayload.u16OnTime  > 0xFFFE))
@@ -787,7 +852,7 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOnWithTimedOffCommand(
         eZCL_SendDefaultResponse(pZPSevent, E_ZCL_CMDS_INVALID_VALUE);
         return E_ZCL_CMDS_INVALID_VALUE;
     }
-    
+
     /*
      * On receipt of this command, if the accept only when on sub-field of the on/off control field is set to
      * 1 and the value of the OnOff attribute is equal to 0x00 (off), the command shall be discarded.
@@ -797,47 +862,9 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOnWithTimedOffCommand(
         return E_ZCL_SUCCESS;
     }
 
-    /*
-     * If the value of the OffWaitTime attribute is greater than zero and the value of the OnOff attribute is
-     * equal to 0x00, then the device shall set the OffWaitTime attribute to the minimum of the OffWaitTime
-     * attribute and the value specified in the off wait time field.
-     *
-     * In all other cases, the device shall set the OnTime attribute to the maximum of the OnTime attribute and
-     * the value specified in the on time field, set the OffWaitTime attribute to the value specified in the off
-     * wait time field and set the OnOff attribute to 0x01 (on).
-     */
-    if((psSharedStruct->u16OffWaitTime > 0) && (psSharedStruct->bOnOff == 0))
-    {
-        psSharedStruct->u16OffWaitTime = MIN(psSharedStruct->u16OffWaitTime, sPayload.u16OffTime);
-    }
-    else
-    {
-        psSharedStruct->u16OnTime = MAX(psSharedStruct->u16OnTime, sPayload.u16OnTime);
-        psSharedStruct->u16OffWaitTime = sPayload.u16OffTime;
+	psSharedStruct->u16OnTime = sPayload.u16OnTime;
+	psSharedStruct->u16OffWaitTime = sPayload.u16OffTime;
 
-        /* If already on, exit */
-        if(psSharedStruct->bOnOff == 0x01)
-        {
-            return eStatus;
-        }
-
-#if (defined CLD_LEVEL_CONTROL) && (defined LEVEL_CONTROL_SERVER)
-        if(eCLD_LevelControlClusterIsPresent(psEndPointDefinition->u8EndPointNumber) == E_ZCL_SUCCESS)
-        {
-            /* Turn On*/
-            eCLD_LevelControlSetOnOffState(psEndPointDefinition->u8EndPointNumber,
-                                           TRUE,
-                                           CLD_ONOFF_OFF_WITH_EFFECT_NONE);
-        }
-        else
-        {
-            psSharedStruct->bOnOff = 0x01;
-        }
-#else
-        psSharedStruct->bOnOff = 0x01;
-#endif
-    }
-    
     /* Generate a callback to let the app know that we need to do an on with timed off */
     sCallBackMessage.u8CommandId                             = u8CommandIdentifier;
     sCallBackMessage.uMessage.psOnWithTimedOffRequestPayload = &sPayload;
@@ -849,6 +876,26 @@ PRIVATE  teZCL_Status eCLD_OnOffHandleOnWithTimedOffCommand(
     sZCL_CallBackEvent.uMessage.sClusterCustomMessage.u16ClusterId = GENERAL_CLUSTER_ID_ONOFF;
     sZCL_CallBackEvent.uMessage.sClusterCustomMessage.pvCustomData = (void*)&sCallBackMessage;
     psEndPointDefinition->pCallBackFunctions(&sZCL_CallBackEvent);
+
+#if defined (CLD_ONOFF_ATTR_ON_TIME) && defined (CLD_ONOFF_ATTR_OFF_WAIT_TIME)
+    // tuya need report attribute
+    tsZCL_Address         sAddress;
+    uint16                u16AttributeIDList[]={E_CLD_ONOFF_ATTR_ID_ON_TIME,E_CLD_ONOFF_ATTR_ID_OFF_WAIT_TIME};
+    uint8                 u8NumberOfAttributesInReport=(sizeof(u16AttributeIDList)/sizeof(u16AttributeIDList[0]));
+
+    // build address structure
+    eZCL_BuildTransmitAddressStructure(pZPSevent, &sAddress);
+    PDUM_thAPduInstance hAPduInst = hZCL_AllocateAPduInstance();    
+    eZCL_ReportSpecificAttributes(&sAddress,
+    	GENERAL_CLUSTER_ID_ONOFF,
+    	pZPSevent->uEvent.sApsDataIndEvent.u8SrcEndpoint,
+		pZPSevent->uEvent.sApsDataIndEvent.u8DstEndpoint,
+		u8NumberOfAttributesInReport,
+		u16AttributeIDList,
+    	hAPduInst);
+
+	PDUM_eAPduFreeAPduInstance(hAPduInst);    
+#endif
 
     return eStatus;
 }
