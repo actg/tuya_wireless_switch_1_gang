@@ -399,7 +399,7 @@ PUBLIC void APP_cbTimerButton2Pressed(void *pvParam)
 		ZTIMER_eStart(u8TimerButton2LongPressed, APP_BUTTONS_2_PRESSED_TIMEOUT);
 
 		// 2 second
-		if(u8Button2Counter >= 4)
+		if(u8Button2Counter >= 8)
 		{
 			u8Button2Counter=0;
 
@@ -416,20 +416,19 @@ PUBLIC void APP_cbTimerButton2Pressed(void *pvParam)
 			memset(s_u8ButtonDebounce,0xFF,sizeof(s_u8ButtonDebounce));
 		}
 	}else{
-		if(u8Button2Counter == 1)
-		{
-			DBG_vPrintf(TRACE_APP_BUTTON, "single clicked\n");
-
-			APP_tsEvent sButton;
-			sButton.eType=APP_E_EVENT_BUTTON_DOWN;
-			sButton.uEvent.sButton.u8Button=OFF_PRESSED;
-			vApp_ProcessKeyCombination(sButton);		
-		}else if(u8Button2Counter == 2)
+		if(u8Button2Counter == 2)
 		{
 			DBG_vPrintf(TRACE_APP_BUTTON, "double clicked\n");
 			APP_tsEvent sButton;
 			sButton.eType=APP_E_EVENT_BUTTON_DOWN;
 			sButton.uEvent.sButton.u8Button=ON_PRESSED;
+			vApp_ProcessKeyCombination(sButton);
+		}else if(u8Button2Counter >= 1 && u8Button2Counter < 8){
+			DBG_vPrintf(TRACE_APP_BUTTON, "single clicked\n");
+
+			APP_tsEvent sButton;
+			sButton.eType=APP_E_EVENT_BUTTON_DOWN;
+			sButton.uEvent.sButton.u8Button=OFF_PRESSED;
 			vApp_ProcessKeyCombination(sButton);
 		}
 
