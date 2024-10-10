@@ -126,7 +126,7 @@ PUBLIC bool_t APP_bButtonInitialise(void)
     vAHI_DioSetDirection(APP_BUTTONS_DIO_MASK, 0);
 
     /* Turn on pull-ups for DIO lines with buttons connected */
-    vAHI_DioSetPullup((1 << APP_BUTTONS_BUTTON_1), (1 << APP_BUTTONS_BUTTON_SW1));
+    vAHI_DioSetPullup(0, APP_BUTTONS_DIO_MASK);
 
     /* Set the edge detection for falling edges */
     vAHI_DioInterruptEdge(0, APP_BUTTONS_DIO_MASK);
